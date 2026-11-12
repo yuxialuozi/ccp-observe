@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The shell window only renders the local panel and never calls Tauri IPC, so the default core permissions are enough.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

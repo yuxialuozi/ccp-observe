@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ccp-observe · 启动失败</title>
+  <style>
+    :root {
+      --bg: #f5f6f8; --surface: #ffffff; --border: #e5e7eb; --text: #1f2329;
+      --muted: #6b7280; --accent: #2563eb; --warn: #d97706; --warn-bg: #fffbeb;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--bg); color: var(--text); display: flex; align-items: center;
+      justify-content: center; padding: 32px;
+      font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      max-width: 620px; width: 100%; padding: 28px 30px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .mark { width: 36px; height: 36px; border-radius: 9px; background: var(--accent);
+      display: flex; align-items: flex-end; gap: 3px; padding: 8px; }
+    .mark i { display: block; width: 5px; border-radius: 2px; background: #fff; }
+    .mark i:nth-child(1) { height: 9px; opacity: .55; }
+    .mark i:nth-child(2) { height: 15px; opacity: .8; }
+    .mark i:nth-child(3) { height: 20px; }
+    .brand h1 { font-size: 16px; margin: 0; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+    .banner {
+      background: var(--warn-bg); border: 1px solid #fde68a; color: #92400e;
+      border-radius: 6px; padding: 12px 14px; font-size: 13px; margin-bottom: 20px;
+    }
+    .diag {
+      background: #f9fafb; border: 1px solid var(--border); border-left: 3px solid #f59e0b;
+      border-radius: 6px; padding: 12px 14px; margin-bottom: 20px;
+      font: 12.5px/1.55 "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      white-space: pre-wrap; word-break: break-word; color: #374151;
+    }
+    .diag[hidden] { display: none; }
+    .diag b { color: #b45309; font-family: inherit; }
+    h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em;
+      color: var(--muted); margin: 20px 0 8px; font-weight: 600; }
+    ol { margin: 0; padding-left: 20px; }
+    li { margin: 6px 0; }
+    code { font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+      background: #f0f1f3; border: 1px solid var(--border); border-radius: 4px;
+      padding: 1px 5px; font-size: 12.5px; }
+    pre { background: #f9fafb; border: 1px solid var(--border); border-radius: 6px;
+      padding: 12px 14px; overflow: auto; font-size: 12.5px; margin: 8px 0; }
+    pre code { background: none; border: 0; padding: 0; }
+    .foot { margin-top: 22px; color: var(--muted); font-size: 12px;
+      border-top: 1px solid var(--border); padding-top: 14px; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <div class="mark"><i></i><i></i><i></i></div>
+      <div>
+        <h1>ccp-observe</h1>
+        <p>AI 编码代理观测面板 · 桌面端</p>
+      </div>
+    </div>
+
+    <div class="banner">
+      本地代理暂未就绪，所以面板打不开。通常是这台机器上找不到 Python，或者端口被别的程序占用了。
+    </div>
+
+    <div class="diag" id="diag" hidden></div>
+
+    <h2>1 · 确认已安装 Python 3</h2>
+    <p>桌面端会自动寻找可用的 Python 3（依次尝试 <code>CCP_PYTHON</code> → <code>py -3</code> →
+      <code>python</code> → 常见安装目录）。如果你在终端里执行 <code>python --version</code>
+      看到「Python was not found」，那是 Windows 自带的商店占位程序，不算是安装——用 <code>py -3 --version</code> 试试。</p>
+    <pre><code>py -3 --version</code></pre>
+    <p>如果没有，请安装 Python 3.9+。也可以设置环境变量 <code>CCP_PYTHON</code> 指向解释器绝对路径：</p>
+    <pre><code>setx CCP_PYTHON "C:\Users\you\AppData\Local\Programs\Python\Python313\python.exe"</code></pre>
+
+    <h2>2 · 检查端口</h2>
+    <p>8787 被占用时代理会自动往后顺延（最多 20 个端口），所以端口冲突通常不会导致失败；
+      但如果连顺延的端口都被占满，或者别的程序在应答 <code>/healthz</code>，就会卡在这里。</p>
+    <pre><code># Windows
+netstat -ano | findstr :8787</code></pre>
+
+    <h2>3 · 直接手动启动（排查用）</h2>
+    <pre><code>py -3 proxy/proxy.py --port 8787</code></pre>
+    <p>看到 <code>CCP_READY</code> 后，在浏览器打开
+      <a href="http://127.0.0.1:8787/_ccp/" target="_blank" rel="noreferrer">http://127.0.0.1:8787/_ccp/</a> 即可。
+      如果它换个端口启动，以 <code>CCP_READY</code> 那一行里的地址为准。</p>
+
+    <div class="foot">
+      修好后重新打开桌面端，或点击托盘图标「打开面板」重试。日志在
+      <code>%APPDATA%\ccp-observe\desktop.log</code>。
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const detail = window.__CCP_DIAG;
+      if (!detail) return;
+      const box = document.getElementById('diag');
+      box.hidden = false;
+      box.innerHTML = '<b>本次启动失败的原因：</b>\n' + String(detail)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    })();
+  </script>
+</body>
+</html>

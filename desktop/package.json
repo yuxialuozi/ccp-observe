@@ -1,0 +1,16 @@
+{
+  "name": "ccp-observe-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Tauri 2 shell for ccp-observe (starts the proxy, tray, panel window)",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "icons": "py -3 scripts/make_icons.py",
+    "bundle-proxy": "node scripts/bundle_proxy.mjs"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

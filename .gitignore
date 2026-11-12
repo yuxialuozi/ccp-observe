@@ -1,0 +1,26 @@
+# runtime state — written by the proxy, never committed
+proxy/state/
+proxy/tests/_state_test/
+__pycache__/
+*.pyc
+*.pyo
+
+# web build inputs
+web/node_modules/
+web/.vite/
+
+# The built panel is committed so a source checkout runs without Node.
+# proxy/static/
+
+# desktop
+desktop/node_modules/
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+desktop/src-tauri/resources/proxy/
+
+# editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

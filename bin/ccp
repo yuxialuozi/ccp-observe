@@ -1,0 +1,44 @@
+#!/bin/sh
+# ccp - run Claude Code or Codex through ccp-observe.
+#
+# Drop-in for `claude` / `codex`: your existing settings keep working
+# (same gateway, same key, same models); requests just go through the local
+# proxy so the panel has data.
+#
+# Usage:  ccp               auto-pick the installed client, then launch
+#         ccp claude        force Claude Code
+#         ccp codex         force Codex
+#         ccp --agent list  show installed clients and the remembered one
+#         ccp --doctor      show what it found, launch nothing
+#         ccp --no-launch   only make sure the proxy is running
+
+self=$0
+# Resolve symlinks so a link placed in ~/.local/bin still finds the proxy.
+while [ -h "$self" ]; do
+  target=$(readlink "$self")
+  case $target in
+    /*) self=$target ;;
+    *) self=$(dirname "$self")/$target ;;
+  esac
+done
+here=$(cd "$(dirname "$self")" && pwd)
+launcher="$here/../proxy/ccp_launch.py"
+
+if [ ! -f "$launcher" ]; then
+  echo "[ccp] 找不到 $launcher" >&2
+  echo "      安装目录可能不完整，请重新安装 ccp-observe。" >&2
+  exit 2
+fi
+
+if [ -n "$CCP_PYTHON" ]; then
+  py=$CCP_PYTHON
+elif command -v python3 >/dev/null 2>&1; then
+  py=python3
+elif command -v python >/dev/null 2>&1; then
+  py=python
+else
+  echo "[ccp] 找不到 Python 3。安装 Python 3.9+，或设置 CCP_PYTHON 指向解释器。" >&2
+  exit 2
+fi
+
+exec "$py" "$launcher" "$@"
